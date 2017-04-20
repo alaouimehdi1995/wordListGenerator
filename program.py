@@ -1,27 +1,47 @@
-'''
-[a,a,a]
-[1,1,1]
-[a,a,b]
-
-aaa
-aab
-aac
-si on est dans le dernier caractère, on ajoute jusqu'à atteindre le max
-sinon, on change le car par le suivant et on retourne au caractère suivant
-
-...
-zzz
-zz0
-zz1
-...
-999
-aaaa
-'''
-
+import sys
+import re
+files={'input':None,'output':None}
+types={'lower':False,'upper':False,'number':False}
 
 Min=3
 Max=4
-chars=['a','b','c']
+chars=['a','b','c','d','e']
+'''
+Args:
+-a:minuscule
+-A:majuscule
+-n:nombre
+-o,--output
+-i, --input
+
+'''
+#def write():#doit écrire tout les 1000 mots
+def getArgs():
+	args=sys.argv[1:]
+	if(len(args)>0):
+		if "-o" in args or "--output" in args:
+			files['output']=args[args.index('-o')+1] if '-o' in args else args[args.index('--output')+1]
+		if "-i" in args or "--input" in args:
+			files['input']=args[args.index('-i')+1] if '-i' in args else args[args.index('--input')+1]
+		result = re.findall('-(a|A|n)(a|A|n)?(a|A|n)?', " ".join(args), re.DOTALL)
+		result= [list(e) for e in result]
+		resultArray=[]
+		for e in result:
+			resultArray+=e
+		
+		
+		types['lower']=('a' in resultArray)
+		types['upper']=('A' in resultArray)
+		types['number']=('n' in resultArray)
+		print(files)
+		print(types)
+		
+
+
+
+
+
+getArgs()
 actualSize=Min
 string=[]
 index=[]
@@ -32,7 +52,7 @@ while(actualSize<=Max):
 		string.append(chars[0])
 		index.append(0)
 	#string=['a','a','a'], index=[0,0,0]
-	print(''.join(string))
+	#print(''.join(string))
 	currentChar=actualSize-1
 	currentIndex=0
 
@@ -42,7 +62,7 @@ while(actualSize<=Max):
 		if(index[currentChar]<len(chars)-1):
 			index[currentChar]+=1
 			string[currentChar]=chars[index[currentChar]]
-			print(''.join(string))
+			#print(''.join(string))
 			currentChar=len(string)-1
 		else:
 			index[currentChar]=0
