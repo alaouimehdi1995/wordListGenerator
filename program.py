@@ -122,6 +122,3 @@ while(wordSize<=limits['max']):
 	wordSize+=1
 
 dumpBuffer()
-
-			
-
