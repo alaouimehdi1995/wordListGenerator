@@ -5,18 +5,12 @@ import re
 files={'input':None,'output':None}
 types={'lower':False,'upper':False,'number':False}
 limits={'min':3,'max':4}
-'''
-Args:
--a:minuscule
--A:majuscule
--n:nombre
--o,--output
--i, --input
--m,--min:min
--M,--max:max
-'''
-#def write():#doit écrire tout les 1000 mots
-def getArgs():
+authorizedChars=[]
+wordBuffer=[] #Writing and emptying it when it's length=1000
+
+#should add -c continue option (read wordlist and finish it)
+#should decrease printing rate for files['output']!=None (optimizing)
+def extractArgs():
 	args=sys.argv[1:]
 	if(len(args)>0): #if there is arguments
 		#Extracting input,output,min and max arguments
@@ -43,7 +37,7 @@ def getArgs():
 		
 		#Creating the authorized characters final list
 
-		authorizedChars=[]
+		global authorizedChars
 		if(files['input']):
 			try:
 				authorizedChars=''.join(open(files['input'],'r').readlines())
@@ -64,17 +58,31 @@ def getArgs():
 				for e in range(48,58):
 					authorizedChars.append(chr(e))
 		authorizedChars=sorted(set(authorizedChars))
-		print(authorizedChars)
-		return authorizedChars
+		
 	else:
 		print("There is no arguments, exiting..")
 		exit(0)
 		
+def dumpBuffer(string,lastIteration=False):
+	global wordBuffer
+	print(string)
+	if(files['output']):
+		wordBuffer.append(string)
+		
+		if(len(wordBuffer)==1000 or lastIteration==True):
+			
+			file=open(files['output'],"a")
+			for e in wordBuffer: file.write(e+"\n")
+			file.close()
+			wordBuffer=[]
 
 
 
 
-authorizedChars=getArgs()
+
+
+
+extractArgs()
 
 actualSize=limits['min']
 string=[]
@@ -84,22 +92,22 @@ while(actualSize<=limits['max']):
 	string=actualSize*[authorizedChars[0]]
 	index=actualSize*[0]
 	#string=['a','a','a'], index=[0,0,0]
-	print(''.join(string))
+	dumpBuffer(''.join(string))
 	currentChar=actualSize-1
 	currentIndex=0
 
-	#initialisé
 	while(currentChar>=0):
 		
 		if(index[currentChar]<len(authorizedChars)-1):
 			index[currentChar]+=1
 			string[currentChar]=authorizedChars[index[currentChar]]
-			print(''.join(string))
+			dumpBuffer(''.join(string))
 			currentChar=len(string)-1
 		else:
 			index[currentChar]=0
 			string[currentChar]=authorizedChars[index[currentChar]]
 			currentChar-=1
+	dumpBuffer(''.join(string),True)
 	actualSize+=1
 				
 		
