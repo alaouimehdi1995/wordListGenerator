@@ -1,3 +1,6 @@
+'''
+WordList Generator Algorithm, conceived and implemented by: ALAOUI Mehdi 2017
+'''
 import sys
 import re
 
@@ -52,6 +55,9 @@ def extractArgs():
 				exit(0)
 			authorizedChars=list(authorizedChars)
 			authorizedChars=[e for e in authorizedChars if (e!=" " and e!="")]
+			if(len(authorizedChars)==0):
+				print("Specified file doesn't contain valid characters, exiting..")
+				exit(0)
 
 		else:
 			if(types['lower']):
@@ -68,7 +74,8 @@ def extractArgs():
 	else:
 		print("There is no arguments, exiting..")
 		exit(0)
-		
+
+
 def dumpBuffer(word=""):
 	global wordBuffer
 
@@ -76,7 +83,7 @@ def dumpBuffer(word=""):
 		wordBuffer.append(word)
 		
 		if(len(wordBuffer)==1000 or not word):
-			print(word)								#printing one word in 1000 iterations is 4x faster than printing all words
+			print(word)						#printing one word in 1000 iterations is 4x faster than printing all words
 			file=open(files['output'],"a")
 			for e in wordBuffer: file.write(e+"\n")
 			file.close()
@@ -85,7 +92,7 @@ def dumpBuffer(word=""):
 		print(word)
 
 
-
+#Main program
 
 extractArgs()
 
