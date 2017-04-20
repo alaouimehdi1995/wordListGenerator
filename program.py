@@ -8,8 +8,14 @@ limits={'min':3,'max':4}
 authorizedChars=[]
 wordBuffer=[] #Writing and emptying it when it's length=1000
 
-#should add -c continue option (read wordlist and finish it)
-#should decrease printing rate for files['output']!=None (optimizing)
+'''
+To do:
+	-Adding -h help section
+	-Adding -c argument to continue the wordlist from existing one
+	-Adding bruteforce option (zip, rar, etc)
+	-Adding -r regex wordlist if possible
+'''
+
 def extractArgs():
 	args=sys.argv[1:]
 	if(len(args)>0): #if there is arguments
@@ -63,65 +69,52 @@ def extractArgs():
 		print("There is no arguments, exiting..")
 		exit(0)
 		
-def dumpBuffer(string,lastIteration=False):
+def dumpBuffer(word=""):
 	global wordBuffer
-	print(string)
+
 	if(files['output']):
-		wordBuffer.append(string)
+		wordBuffer.append(word)
 		
-		if(len(wordBuffer)==1000 or lastIteration==True):
-			
+		if(len(wordBuffer)==1000 or not word):
+			print(word)								#printing one word in 1000 iterations is 4x faster than printing all words
 			file=open(files['output'],"a")
 			for e in wordBuffer: file.write(e+"\n")
 			file.close()
 			wordBuffer=[]
-
-
-
+	else:
+		print(word)
 
 
 
 
 extractArgs()
 
-actualSize=limits['min']
-string=[]
+wordSize=limits['min']
+word=[]
 index=[]
 
-while(actualSize<=limits['max']):
-	string=actualSize*[authorizedChars[0]]
-	index=actualSize*[0]
-	#string=['a','a','a'], index=[0,0,0]
-	dumpBuffer(''.join(string))
-	currentChar=actualSize-1
+while(wordSize<=limits['max']):
+	word=wordSize*[authorizedChars[0]]
+	index=wordSize*[0]
+	#word=['a','a','a'], index=[0,0,0]
+	dumpBuffer(''.join(word))
+	currentChar=wordSize-1
 	currentIndex=0
 
 	while(currentChar>=0):
 		
 		if(index[currentChar]<len(authorizedChars)-1):
 			index[currentChar]+=1
-			string[currentChar]=authorizedChars[index[currentChar]]
-			dumpBuffer(''.join(string))
-			currentChar=len(string)-1
+			word[currentChar]=authorizedChars[index[currentChar]]
+			dumpBuffer(''.join(word))
+			currentChar=len(word)-1
 		else:
 			index[currentChar]=0
-			string[currentChar]=authorizedChars[index[currentChar]]
+			word[currentChar]=authorizedChars[index[currentChar]]
 			currentChar-=1
-	dumpBuffer(''.join(string),True)
-	actualSize+=1
-				
-		
+	wordSize+=1
 
-'''
-Algorithme:
-taille du mot=min
-tant que la taille <max:
-	on initialise un tableau string de la taille actuelle, entierement fait par authorizedChars[0]
-	aussi un tableau index de la taille actuelle, entierement fait de 0
-	le caractère courant est le dernier,
-	tant qu'on n'a pas atteint le premier ( la fin)
-	si on n'a pas encore fini authorizedChars pour le caractère actuel, on incrémente l'index du caractère actuel, on change le caractère, et on retourne à la fin de la chaine
-	si on atteint la limite, on remet l'index actuel à 0, on change le caractère et le caractère courant devient celui qui le précède
-'''
+dumpBuffer()
+
 			
 
