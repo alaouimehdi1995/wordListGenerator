@@ -121,7 +121,7 @@ def estimate(authorizedChars):
 			currentChar-=1
 	executionTime=time.time()-start
 	estimatedTime=(executionTime/(len(authorizedChars)**wordSize))*totalWords
-	estimatedTime+=0.022980802*(totalWords/limits['toDisplay'])
+	estimatedTime+=0.022980802*(totalWords/limits['toDisplay'])	#this line adds the estimated time of total prints in the screen
 	return estimatedTime
 
 
@@ -159,11 +159,12 @@ extractArgs()
 totalWords=0
 actualWords=0
 
-for i in range(limits['min'],limits['max']+1):
+for i in range(limits['min'],limits['max']+1):	#Counting words to generate
 	totalWords+=len(authorizedChars)**i
+
 print("This program will generate ",totalWords," words")
 print("estimating time..")
-estimatedTime=estimate(authorizedChars)
+estimatedTime=estimate(authorizedChars)			#Estimating time
 print("estimated time: ",estimatedTime," seconds, tap any key to begin")
 input()
 
