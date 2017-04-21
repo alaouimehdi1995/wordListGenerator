@@ -3,11 +3,12 @@ WordList Generator Algorithm, conceived and implemented by: ALAOUI Mehdi 2017
 '''
 import sys
 import re
+import time
 
 
 files={'input':None,'output':None}
 types={'lower':False,'upper':False,'number':False}
-limits={'min':3,'max':4}
+limits={'min':3,'max':4,'toDisplay':100000}
 authorizedChars=[]
 wordBuffer=[] #Writing and emptying it when it's length=1000
 
@@ -76,35 +77,29 @@ def extractArgs():
 		exit(0)
 
 
-def dumpBuffer(word=""):
+def dumpBuffer(file,word=""):
 	global wordBuffer
-
+	global actualWords
+	global totalWords
 	if(files['output']):
 		wordBuffer.append(word)
 		
-		if(len(wordBuffer)==1000 or not word):
-			print(word)						#printing one word in 1000 iterations is 4x faster than printing all words
-			file=open(files['output'],"a")
+		if(len(wordBuffer)==limits['toDisplay'] or not word):
+			actualWords+=len(wordBuffer)
+			print(word," (",round(100*(actualWords/totalWords),3),"%)")						#printing one word in 1000 iterations is 4x faster than printing all words
+			file=open(file,"a")
 			for e in wordBuffer: file.write(e+"\n")
 			file.close()
 			wordBuffer=[]
 	else:
 		print(word)
 
-
-#Main program
-
-extractArgs()
-
-wordSize=limits['min']
-word=[]
-index=[]
-
-while(wordSize<=limits['max']):
+def estimate(authorizedChars):
+	wordSize=3
+	wordBuffer=[]
+	start=time.time()
 	word=wordSize*[authorizedChars[0]]
 	index=wordSize*[0]
-	#word=['a','a','a'], index=[0,0,0]
-	dumpBuffer(''.join(word))
 	currentChar=wordSize-1
 	currentIndex=0
 
@@ -113,12 +108,65 @@ while(wordSize<=limits['max']):
 		if(index[currentChar]<len(authorizedChars)-1):
 			index[currentChar]+=1
 			word[currentChar]=authorizedChars[index[currentChar]]
-			dumpBuffer(''.join(word))
+			wordBuffer.append(''.join(word))
+			if(len(wordBuffer)==limits['toDisplay'] or not word):
+				file=open('tmp',"a")
+				for e in wordBuffer: file.write(e+"\n")
+				file.close()
+				wordBuffer=[]
 			currentChar=len(word)-1
 		else:
 			index[currentChar]=0
 			word[currentChar]=authorizedChars[index[currentChar]]
 			currentChar-=1
-	wordSize+=1
+	executionTime=time.time()-start
+	estimatedTime=(executionTime/(len(authorizedChars)**wordSize))*totalWords
+	estimatedTime+=0.022980802*(totalWords/limits['toDisplay'])
+	return estimatedTime
 
-dumpBuffer()
+
+
+def bruteforce(authorizedChars,Min,Max):
+	wordSize=Min
+	word=[]
+	index=[]
+	while(wordSize<=Max):
+		word=wordSize*[authorizedChars[0]]
+		index=wordSize*[0]
+		#word=['a','a','a'], index=[0,0,0]
+		dumpBuffer(files['output'],''.join(word))
+		currentChar=wordSize-1
+		currentIndex=0
+
+		while(currentChar>=0):
+			
+			if(index[currentChar]<len(authorizedChars)-1):
+				index[currentChar]+=1
+				word[currentChar]=authorizedChars[index[currentChar]]
+				dumpBuffer(files['output'],''.join(word))
+				currentChar=len(word)-1
+			else:
+				index[currentChar]=0
+				word[currentChar]=authorizedChars[index[currentChar]]
+				currentChar-=1
+		wordSize+=1
+
+	dumpBuffer(files['output'],)
+
+#Main program
+
+extractArgs()
+totalWords=0
+actualWords=0
+
+for i in range(limits['min'],limits['max']+1):
+	totalWords+=len(authorizedChars)**i
+print("This program will generate ",totalWords," words")
+print("estimating time..")
+estimatedTime=estimate(authorizedChars)
+print("estimated time: ",estimatedTime," seconds, tap any key to begin")
+input()
+
+d=time.time()
+bruteforce(authorizedChars,limits['min'],limits['max'])
+print("execution time: ",time.time()-d," secondes")
